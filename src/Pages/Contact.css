@@ -1,0 +1,136 @@
+.contact-page {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 100px;
+  background: radial-gradient(circle at top left, #0f172a, #1e293b);
+  font-family: "Poppins", sans-serif;
+  color: white;
+  flex-wrap: wrap;
+  min-height: 90vh;
+  overflow-x: hidden;
+}
+
+/* Left Panel */
+.contact-left {
+  flex: 1;
+  max-width: 500px;
+}
+
+.contact-left h1 {
+  font-size: 2.7rem;
+  line-height: 1.3;
+}
+
+.ai-highlight {
+  color: #38bdf8;
+  text-shadow: 0 0 15px #38bdf8;
+}
+
+.contact-left p {
+  margin-top: 20px;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.contact-info {
+  margin-top: 40px;
+}
+
+.contact-info p {
+  margin: 10px 0;
+  font-size: 1rem;
+}
+
+.contact-info span {
+  margin-right: 10px;
+  color: #38bdf8;
+}
+
+/* Right Panel */
+.contact-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.contact-form {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  animation: fadeUp 1s ease;
+}
+
+@keyframes fadeUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.contact-form h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #38bdf8;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.07);
+  color: white;
+  transition: 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+}
+
+.btn-glow {
+  width: 100%;
+  padding: 12px;
+  background: #38bdf8;
+  border: none;
+  border-radius: 10px;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+}
+
+.btn-glow:hover {
+  background: #0ea5e9;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.7);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .contact-page {
+    flex-direction: column;
+    text-align: center;
+    padding: 60px 30px;
+  }
+
+  .contact-left {
+    margin-bottom: 50px;
+  }
+
+  .contact-right {
+    width: 100%;
+  }
+}
