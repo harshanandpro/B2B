@@ -1,8 +1,30 @@
 import React, { useState } from 'react'
 import "./Dashboard.css"
 
+// Helper function to calculate business importance score
+function getBusinessImportance(match) {
+  // Update weights as needed for your real business logic!
+  // Example: 50% matchScore, 30% deal value, 20% status.
+  const statusWeight = match.status === "Won" ? 100
+    : match.status === "Applied" ? 70
+    : match.status === "Matched" ? 50
+    : 0;
+
+  // Extract numeric value from $ string
+  const valueNum = Number(match.value.replace(/[^0-9.]/g, '')) || 0;
+  // Normalize deal value to a max ($100,000), adjust as needed
+  const normValue = Math.min(100, Math.round((valueNum / 100000) * 100));
+
+  // Final weighted score (out of 100)
+  return Math.round(
+    0.5 * match.matchScore +
+    0.3 * normValue +
+    0.2 * statusWeight
+  );
+}
+
 const Dashboard = () => {
-  // Dummy data
+  // Example data structure
   const stats = {
     totalRFPs: 24,
     matched: 18,
@@ -51,7 +73,7 @@ const Dashboard = () => {
       date: "2025-10-25",
       value: "$65,000"
     }
-  ]
+  ];
 
   const inventoryHighlights = [
     { name: "Executive Desk", stock: 45, category: "Furniture", demand: "High" },
@@ -59,9 +81,9 @@ const Dashboard = () => {
     { name: "Safety Helmet", stock: 200, category: "Safety", demand: "Medium" },
     { name: "Ergonomic Chair", stock: 80, category: "Furniture", demand: "High" },
     { name: "Network Router", stock: 55, category: "Electronics", demand: "Medium" }
-  ]
+  ];
 
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('overview');
 
   return (
     <div className="dashboard">
@@ -81,7 +103,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">✓</div>
+          <div className="stat-icon">✔</div>
           <div className="stat-info">
             <h3>{stats.matched}</h3>
             <p>Inventory Matched</p>
@@ -105,24 +127,23 @@ const Dashboard = () => {
 
       {/* Tabs */}
       <div className="dashboard-tabs">
-        <button 
-          className={activeTab === 'overview' ? 'tab-active' : ''} 
+        <button
+          className={activeTab === 'overview' ? 'tab-active' : ''}
           onClick={() => setActiveTab('overview')}
         >
           Overview
         </button>
-        <button 
-          className={activeTab === 'inventory' ? 'tab-active' : ''} 
+        <button
+          className={activeTab === 'inventory' ? 'tab-active' : ''}
           onClick={() => setActiveTab('inventory')}
         >
           Inventory
         </button>
       </div>
 
-      {/* Content Area */}
+      {/* Overview Tab: RFP Matches */}
       {activeTab === 'overview' && (
         <>
-          {/* Recent Matches Section */}
           <section className="matches-section">
             <h2>Recent RFP Matches</h2>
             <div className="matches-list">
@@ -137,19 +158,28 @@ const Dashboard = () => {
                       {match.status}
                     </span>
                   </div>
-                  
                   <div className="match-details">
                     <div className="detail-item">
                       <span className="label">Match Score:</span>
                       <div className="score-bar">
-                        <div 
-                          className="score-fill" 
-                          style={{width: `${match.matchScore}%`}}
+                        <div
+                          className="score-fill"
+                          style={{ width: `${match.matchScore}%` }}
                         ></div>
                         <span className="score-text">{match.matchScore}%</span>
                       </div>
                     </div>
-                    
+                    <div className="detail-item">
+                      <span className="label">Business Importance:</span>
+                      <div className="importance-score" title="Calculated using Match Score, Deal Value, and Status">
+                        <span style={{
+                          fontWeight: 'bold',
+                          color: getBusinessImportance(match) > 80 ? '#059669' : (getBusinessImportance(match) > 60 ? '#f59e42' : '#d97706')
+                        }}>
+                          {getBusinessImportance(match)} / 100
+                        </span>
+                      </div>
+                    </div>
                     <div className="detail-item">
                       <span className="label">Matched Products:</span>
                       <div className="product-tags">
@@ -158,7 +188,6 @@ const Dashboard = () => {
                         ))}
                       </div>
                     </div>
-                    
                     <div className="match-footer">
                       <span className="date">📅 {match.date}</span>
                       <span className="value">💰 {match.value}</span>
@@ -171,6 +200,7 @@ const Dashboard = () => {
         </>
       )}
 
+      {/* Inventory Tab: Items Table */}
       {activeTab === 'inventory' && (
         <section className="inventory-section">
           <h2>High-Demand Inventory Items</h2>
@@ -209,3 +239,5 @@ const Dashboard = () => {
 }
 
 export default Dashboard
+```
+
