@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import "./Dashboard.css"
+import React, { useState } from 'react';
+import "./Dashboard.css";
 
 // Helper function to calculate business importance score
 function getBusinessImportance(match) {
@@ -10,14 +10,14 @@ function getBusinessImportance(match) {
     : match.status === "Matched" ? 50
     : 0;
 
-  // Extract numeric value from $ string
-  const valueNum = Number(match.value.replace(/[^0-9.]/g, '')) || 0;
+  // Extract numeric value from $ string (guard value)
+  const valueNum = Number((match.value || '').replace(/[^0-9.]/g, '')) || 0;
   // Normalize deal value to a max ($100,000), adjust as needed
   const normValue = Math.min(100, Math.round((valueNum / 100000) * 100));
 
   // Final weighted score (out of 100)
   return Math.round(
-    0.5 * match.matchScore +
+    0.5 * (match.matchScore || 0) +
     0.3 * normValue +
     0.2 * statusWeight
   );
@@ -30,7 +30,7 @@ const Dashboard = () => {
     matched: 18,
     applied: 12,
     success: 8
-  }
+  };
 
   const recentMatches = [
     {
@@ -235,9 +235,7 @@ const Dashboard = () => {
         </section>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
-```
-
+export default Dashboard;
