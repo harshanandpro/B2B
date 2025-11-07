@@ -3,18 +3,16 @@ import "./Dashboard.css"
 
 // Helper function to calculate business importance score
 function getBusinessImportance(match) {
-  // Update weights as needed for your real business logic!
-  // Example: 50% matchScore, 30% deal value, 20% status.
+  // Defensive coding: ensure value exists and is a string
+  const valueStr = typeof match.value === "string" ? match.value : "";
+  // Extract numeric value from $ string
+  const valueNum = Number(valueStr.replace(/[^0-9.]/g, '')) || 0;
+  // Normalize deal value to a max ($100,000), adjust as needed
+  const normValue = Math.min(100, Math.round((valueNum / 100000) * 100));
   const statusWeight = match.status === "Won" ? 100
     : match.status === "Applied" ? 70
     : match.status === "Matched" ? 50
     : 0;
-
-  // Extract numeric value from $ string
-  const valueNum = Number(match.value.replace(/[^0-9.]/g, '')) || 0;
-  // Normalize deal value to a max ($100,000), adjust as needed
-  const normValue = Math.min(100, Math.round((valueNum / 100000) * 100));
-
   // Final weighted score (out of 100)
   return Math.round(
     0.5 * match.matchScore +
@@ -24,7 +22,6 @@ function getBusinessImportance(match) {
 }
 
 const Dashboard = () => {
-  // Example data structure
   const stats = {
     totalRFPs: 24,
     matched: 18,
@@ -96,28 +93,28 @@ const Dashboard = () => {
       {/* Stats Cards */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon">📋</div>
+          <div className="stat-icon" aria-label="Total RFPs">📋</div>
           <div className="stat-info">
             <h3>{stats.totalRFPs}</h3>
             <p>Total RFPs Scanned</p>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">✔</div>
+          <div className="stat-icon" aria-label="Matched">✔</div>
           <div className="stat-info">
             <h3>{stats.matched}</h3>
             <p>Inventory Matched</p>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">🚀</div>
+          <div className="stat-icon" aria-label="Applied">🚀</div>
           <div className="stat-info">
             <h3>{stats.applied}</h3>
             <p>Applications Sent</p>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">🏆</div>
+          <div className="stat-icon" aria-label="Won">🏆</div>
           <div className="stat-info">
             <h3>{stats.success}</h3>
             <p>Contracts Won</p>
@@ -130,12 +127,14 @@ const Dashboard = () => {
         <button
           className={activeTab === 'overview' ? 'tab-active' : ''}
           onClick={() => setActiveTab('overview')}
+          type="button"
         >
           Overview
         </button>
         <button
           className={activeTab === 'inventory' ? 'tab-active' : ''}
           onClick={() => setActiveTab('inventory')}
+          type="button"
         >
           Inventory
         </button>
@@ -143,18 +142,22 @@ const Dashboard = () => {
 
       {/* Overview Tab: RFP Matches */}
       {activeTab === 'overview' && (
-        <>
-          <section className="matches-section">
-            <h2>Recent RFP Matches</h2>
-            <div className="matches-list">
-              {recentMatches.map(match => (
+        <section className="matches-section">
+          <h2>Recent RFP Matches</h2>
+          <div className="matches-list">
+            {recentMatches.map(match => {
+              // Unique keys are always id for matches
+              const importanceScore = getBusinessImportance(match);
+              return (
                 <div key={match.id} className="match-card">
                   <div className="match-header">
                     <div>
                       <h3>{match.rfpTitle}</h3>
                       <p className="company-name">{match.company}</p>
                     </div>
-                    <span className={`status-badge status-${match.status.toLowerCase()}`}>
+                    <span
+                      className={`status-badge status-${match.status.replace(/\s+/g, '-').toLowerCase()}`}
+                    >
                       {match.status}
                     </span>
                   </div>
@@ -171,21 +174,34 @@ const Dashboard = () => {
                     </div>
                     <div className="detail-item">
                       <span className="label">Business Importance:</span>
-                      <div className="importance-score" title="Calculated using Match Score, Deal Value, and Status">
-                        <span style={{
-                          fontWeight: 'bold',
-                          color: getBusinessImportance(match) > 80 ? '#059669' : (getBusinessImportance(match) > 60 ? '#f59e42' : '#d97706')
-                        }}>
-                          {getBusinessImportance(match)} / 100
+                      <div
+                        className="importance-score"
+                        title="Calculated using Match Score, Deal Value, and Status"
+                      >
+                        <span
+                          style={{
+                            fontWeight: 'bold',
+                            color:
+                              importanceScore > 80
+                                ? '#059669'
+                                : importanceScore > 60
+                                ? '#f59e42'
+                                : '#d97706'
+                          }}
+                        >
+                          {importanceScore} / 100
                         </span>
                       </div>
                     </div>
                     <div className="detail-item">
                       <span className="label">Matched Products:</span>
                       <div className="product-tags">
-                        {match.matchedProducts.map((product, idx) => (
-                          <span key={idx} className="product-tag">{product}</span>
-                        ))}
+                        {Array.isArray(match.matchedProducts) &&
+                          match.matchedProducts.map((product, idx) => (
+                            <span key={idx} className="product-tag">
+                              {product}
+                            </span>
+                          ))}
                       </div>
                     </div>
                     <div className="match-footer">
@@ -194,10 +210,10 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
-        </>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {/* Inventory Tab: Items Table */}
@@ -216,7 +232,7 @@ const Dashboard = () => {
               </thead>
               <tbody>
                 {inventoryHighlights.map((item, idx) => (
-                  <tr key={idx}>
+                  <tr key={item.name}>
                     <td>{item.name}</td>
                     <td>
                       <span className="category-badge">{item.category}</span>
